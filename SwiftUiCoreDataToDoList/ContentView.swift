@@ -20,12 +20,34 @@ struct ContentView: View {
                 Section(header: Text("What's next?")){
                     HStack{
                         TextField("New item", text: self.$newTodoItem)
+                        Button(action: {
+                            let toDoItem = ToDoItem(context: self.managedObjectContext)
+                            toDoItem.title = self.newTodoItem
+                            toDoItem.createdAt = Date()
+                            
+                            do{
+                                try self.managedObjectContext.save()
+                            } catch{
+                                print(error)
+                            }
+                            
+                            self.newTodoItem = ""
+                        }){
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.green)
+                                .imageScale(.large)
+                        }
+                    }
+                }.font(.headline)
+                Section(header: Text("To do's")) {
+                    ForEach(self.toDoItems) {toDoItem in
+                        ToDoItemView(title: toDoItem.title!, createdAt: "\(toDoItem.createdAt!)")
                     }
                 }
             }
+            .navigationBarTitle(Text("My list"))
+            .navigationBarItems(trailing: EditButton())
         }
-    .navigationBarTitle(Text("My list"))
-    .navigationBarItems(trailing: EditButton())
         
     }
 }
